@@ -5,6 +5,7 @@ ADL (Agent Definition Language) is a vendor-neutral, declarative standard for de
 <p align="center">
   <img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="Apache 2.0 License"/>
   <img src="https://img.shields.io/badge/schema-validated-brightgreen" alt="Schema Validated"/>
+  [![GitHub Repo](https://img.shields.io/badge/ADL-GitHub-black?logo=github)](https://github.com/nextmoca/adl)
 </p>
 
 ---

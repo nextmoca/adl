@@ -1,154 +1,63 @@
 {
-  "id": "483fa0f5-7854-48e4-9347-25d5e47d7e2b",
-  "version": 3,
-  "name": "generate campaign image",
-  "description": "The Creative Producer Agent transforms the creative campaign plan into artifacts like images that will be used as part of the marketing campaign.\n",
-  "role": "Creative Producer",
-  "llm": "openai",
-  "llm_settings": {
-    "temperature": 0,
-    "max_tokens": 4096
-  },
-  "owner": "admin",
-  "document_index_id": "7baba728-2d3b-48d6-b46b-94aa3f76ab29",
-  "rag": [
-    {
-      "id": "7baba728-2d3b-48d6-b46b-94aa3f76ab29",
-      "name": "Campaign Image Input",
-      "rag_type": "doc",
-      "virtual_index_path": "/rags/7baba728-2d3b-48d6-b46b-94aa3f76ab29",
-      "location_type": "local",
-      "remote_path": null,
-      "metadata": {}
-    }
-  ],
-  "tools": [
-    {
-      "name": "generate_campaign_image",
-      "description": "The Generate Image with Gemini 2.5 Flash tool creates high-quality 1024\u00d71024 pixel images from natural language prompts using Google\u2019s Gemini 2.5 Flash Image Generation API. It connects to the official endpoint https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent and authenticates securely using api key AIzaSyBydXAVfnQM98gDVG6N-omfrhndbJceVUg that is passed as url parameter key.When executed, the tool sends a JSON payload containing the prompt to the Gemini model, retrieves the API\u2019s JSON response, and extracts the base64-encoded image data from the nested candidates \u2192 content \u2192 parts \u2192 inlineData structure. It validates that valid image data is present\u2014returning a descriptive error if not\u2014then decodes the base64 string into binary image bytes, ensures the destination directory exists, and saves the resulting .png files. The tool returns structured JSON containing the saved file paths, prompt, number of images generated, and model metadata. This implementation provides a secure, efficient, and production-grade method for programmatically generating and saving images from Gemini within Python, designed for seamless integration into creative pipelines and agentic systems. Save the image to the given destination folder.",
-      "parameters": [
-        {
-          "name": "prompt",
-          "type": "string",
-          "description": "the image prompt"
-        }
-      ],
-      "invocation": {
-        "type": "python_function"
+   "id":"483fa0f5-7854-48e4-9347-25d5e47d7e2b",
+   "version":3,
+   "name":"generate campaign image",
+   "description":"The Creative Producer Agent transforms the creative campaign plan into artifacts like images that will be used as part of the marketing campaign.\n",
+   "role":"Creative Producer",
+   "llm":"openai",
+   "llm_settings":{
+      "temperature":0,
+      "max_tokens":4096
+   },
+   "owner":"admin",
+   "document_index_id":"7baba728-2d3b-48d6-b46b-94aa3f76ab29",
+   "rag":[
+      {
+         "id":"7baba728-2d3b-48d6-b46b-94aa3f76ab29",
+         "name":"Campaign Image Input",
+         "rag_type":"doc",
+         "virtual_index_path":"/rags/7baba728-2d3b-48d6-b46b-94aa3f76ab29",
+         "location_type":"local",
+         "remote_path":null,
+         "metadata":{
+            
+         }
       }
-    },
-    {
-      "name": "query_doc_rag_raw_paged_func",
-      "description": "Paged RAG for large result sets. Use when you expect many matches, for example lots of resumes, and need to iterate in pages instead of pulling everything at once.\n\nWhat it does:\n- Returns up to batch_size items per call, ordered by relevance to the query.\n- Includes pagination controls: has_more, next_cursor, total_available, and count.\n- Optional knobs if supported by implementation:\n  - cursor as an integer page offset to continue from.\n  - batch_size as an integer page size, typically 20 for tool-use loops.\n  - include_metadata as a boolean to include source headers for citation.\n  - summarize_each as a boolean to map-summarize each doc before returning, which is token-friendly.\n  - return_both as a boolean to return both raw docs and summaries for auditability.\n  - summary_star knobs for model, length, and style caps for summaries.\n\nWhen to use this paged tool instead of the non-paged query_doc_rag:\n- You need to collect ten or more unique items, for example pick the best twenty five resumes.\n- You plan to loop by reading a page, scoring or summarizing, then requesting the next page until you have enough.\n- You must control tokens by requesting small pages and or per-doc summaries.\n- You want deterministic iteration using cursor and has_more instead of a single large fetch.\n\nUsage pattern for an agent loop:\n1. Start with cursor equals zero and a small batch_size, for example five or ten.\n2. After each call, extract facts from docs, or from summaries when summarize_each is true.\n3. Keep calling with cursor equal to next_cursor while has_more is true and until you have at least the target count of unique items, for example at least twenty five resumes. If has_more becomes false before reaching the target, state that fewer exist.\n4. Cite sources using the included metadata such as filename, source_stem, parent_id, and page.\n\nGood query examples:\n- CitizenShipper AI ML Engineer required skills, responsibilities, and preferred qualifications.\n- Resumes that mention BOTH SageMaker AND Kubernetes AND five plus years.\n- Evidence of fraud detection, risk scoring, or compliance automation in resumes.\n- RAG or LLM pipeline experience with Pinecone or FAISS.\n- Route optimization or price prediction experience relevant to the job description.\n\nCall examples without curly braces:\n- Page 1 summarized docs to save tokens:\n  query equals AI ML resumes matching CitizenShipper role criteria, batch_size equals 5, cursor equals 0, summarize_each equals true\n  Then read docs which are summaries and note next_cursor.\n- Page 2 continue:\n  query equals AI ML resumes matching CitizenShipper role criteria, batch_size equals 5, cursor equals 5, summarize_each equals true\n  Continue until you have evaluated at least twenty five unique candidates or has_more equals false.\n- Audit mode return both raw plus summaries:\n  query equals fraud detection AND LLM compliance automation, batch_size equals 5, cursor equals 0, summarize_each equals true, return_both equals true\n\nDo:\n- Use this tool when the final answer requires selecting a top N set from many documents, for example twenty five resumes.\n- De-duplicate across pages using names and metadata.\n- Stop only when you reach the target count or has_more is false.\n\nDo not:\n- Do not assume all results fit in one call; always respect has_more and next_cursor.\n- Do not synthesize unsupported facts; stay grounded in returned passages.",
-      "parameters": [
-        {
-          "name": "query",
-          "type": "string",
-          "description": "Natural-language search string with constraints such as skills, years, tools, titles, and similar."
-        }
-      ],
-      "invocation": {
-        "type": "python_function",
-        "function": "direct_response"
+   ],
+   "tools":[
+      {
+         "name":"generate_image_using_gemini",
+         "display_name":"generate_image_using_gemini",
+         "description":"Generate a single image from a text prompt using the google-genai SDK with the gemini-3-pro-image-preview model, saving the image file into /home/images directory and returning its absolute path.",
+         "parameters":[
+            {
+               "name":"prompt",
+               "type":"string",
+               "default":null,
+               "description":"The exact text prompt to send to the Gemini image generation model. This string must be passed through to the API without modification."
+            },
+            {
+               "name":"output_filename",
+               "type":"string",
+               "default":null,
+               "description":"Optional filename for the generated image (e.g. 'my_image.png'). If omitted or empty, a unique filename (e.g. with timestamp or UUID) must be generated. The file must be created under the NM_OUTPUT_DIR directory."
+            }
+         ],
+         "keys_schema":[
+            {
+               "name":"NM_GEMINI_API_KEY",
+               "description":"API key for authenticating with the Google Generative AI service via the google-genai SDK.",
+               "key_type":"environment_variable"
+            }
+         ],
+         "sources":[
+            
+         ],
+         "tool_id":"2d8a4c0a-1f09-4d2a-9b6d-7b0e4eb810b5",
+         "dependencies":[
+            "google-genai"
+         ],
+         "category":"Image Generation"
       }
-    },
-    {
-      "name": "query_doc_rag",
-      "description": "(RAG) Semantic search over the indexed document set to retrieve the MOST RELEVANT, source-grounded passages for a natural-language query. Use this for targeted lookups, for example job requirements or specific skills or metrics in resumes, where you expect a small handful of high-signal excerpts.\n\nWhen to use this vs paged RAG:\n- Use this tool for focused queries that should return a small set of passages, for example fewer than ten.\n- If you need to iterate through many documents, for example select top twenty five resumes, use the paged variant query_doc_rag_raw_paged_func to page through results deterministically.\n\nWhat it returns:\n- An ordered list of short passages, most relevant first.\n- Each passage may include a metadata header such as filename, page, source_stem, parent_id so you can cite or follow up.\n\nTypical agent workflow:\n1. Pull criteria from the job description, such as titles, required skills, and metrics.\n2. Query resumes for concrete evidence of those criteria.\n3. Synthesize only after reviewing returned passages; cite sources by filename and page.\n\nGood query examples:\n- Job description mining\n  1. CitizenShipper AI ML Engineer required skills and preferred qualifications\n  2. Responsibilities and metrics for AI ML Engineer at CitizenShipper, for example route optimization and price prediction\n- Resume evidence checks\n  3. Resumes mentioning BOTH SageMaker and Kubernetes with five plus years experience\n  4. LLM or RAG pipelines using Pinecone OR FAISS in production\n  5. Fraud detection or risk scoring systems with measurable impact, for example savings, latency, or scale\n  6. Experience with streaming or data pipelines such as Kafka, Airflow, Spark, PySpark\n- Cross cutting constraints\n  7. Hands on owner or builder mindset; shipped models to production; startup or marketplace experience\n\nQuery crafting tips:\n- Put key entities and constraints directly in the query, such as skills, years, tools, and outcomes.\n- For AND style intent, include all terms in one query, for example SageMaker Kubernetes five plus years.\n- For synonym probing, issue multiple calls, for example FAISS then Pinecone.\n- If results are thin or noisy, reformulate with more precise terms, metrics, or role specific nouns.\n\nConceptual return sample shape only:\n[filename: SamyukthaKazaResume.pdf | page: 1 | source_stem: SamyukthaKazaResume]\n- Deployed LLM based RAG pipelines using Pinecone; AKS and Docker for production; reduced retrieval latency thirty five percent.\n\n[filename: Michael_Lupo_21-08-2025.pdf | page: 1 | source_stem: Michael_Lupo]\n- Built fraud detection engine in banking; cut false positives eighteen percent; SageMaker and Lambda; real time scoring.\n\nImportant:\n- Treat returned passages as ground truth; do not add facts not present in tool results.\n- Always cite using the provided metadata such as filename, source_stem, and page.",
-      "parameters": [
-        {
-          "name": "query",
-          "type": "string",
-          "description": "Natural-language search string with explicit constraints such as skills, years, tools, impacts, and titles."
-        }
-      ],
-      "invocation": {
-        "type": "python_function",
-        "function": "direct_response"
-      }
-    },
-    {
-      "name": "query_code_rag",
-      "description": "(RAG) Query the indexed codebase to retrieve relevant code and symbols with context.",
-      "parameters": [
-        {
-          "name": "query",
-          "type": "string",
-          "description": "Query to execute"
-        }
-      ],
-      "invocation": {
-        "type": "python_function",
-        "function": "direct_response"
-      }
-    },
-    {
-      "id": "9c246943-7734-414d-b606-32c6365d5ab4",
-      "tool_id": "33840fb0-b7dd-48ca-911e-0006c7bb8907",
-      "version": 1,
-      "name": "save_pdf",
-      "display_name": "save_pdf",
-      "description": "Convert a Markdown string into a professionally styled PDF file saved under the NM_OUTPUT_DIR directory, optionally using custom CSS.",
-      "category": "File Operations",
-      "parameters": [
-        {
-          "name": "markdown_string",
-          "type": "string",
-          "description": "Raw Markdown content to convert into a PDF. Should include any desired headings, lists, tables, and code blocks.",
-          "required": true,
-          "default": null
-        },
-        {
-          "name": "output_filename",
-          "type": "string",
-          "description": "Desired filename for the generated PDF, including the '.pdf' extension (e.g., 'report.pdf'). Must be a bare filename with no directory components or path traversal sequences.",
-          "required": false,
-          "default": null
-        },
-        {
-          "name": "css_string",
-          "type": "string",
-          "description": "Optional CSS stylesheet as a string to style the PDF. If omitted or empty, a built-in professional default CSS will be applied.",
-          "required": false,
-          "default": null
-        }
-      ],
-      "returns": {
-        "type": "object",
-        "description": "Result containing success status and file path or error message"
-      },
-      "dependencies": [
-        "markdown2==2.4.10",
-        "reportlab==4.0.7",
-        "weasyprint"
-      ],
-      "keys_schema": [
-        {
-          "name": "NM_OUTPUT_DIR",
-          "description": "Absolute directory path where generated PDF files must be written.",
-          "key_type": "environment_variable"
-        }
-      ],
-      "sources": [],
-      "permissions": {
-        "network": false,
-        "file_read": [],
-        "file_write": [
-          "/output"
-        ],
-        "env_vars": [
-          "NM_OUTPUT_DIR"
-        ]
-      },
-      "visibility": "public",
-      "status": "active",
-      "code_file": "tool.py",
-      "created_by": "admin",
-      "created_at": "2025-11-23T00:00:00Z",
-      "invocation": {
-        "type": "python_function",
-        "function": "save_pdf"
-      }
-    }
-  ]
+   ]
 }

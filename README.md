@@ -13,6 +13,9 @@
 
 ## 🚀 Overview
 
+For questions or contributions, visit: https://github.com/nextmoca/adl/issues
+
+## Getting Started
 **ADL (Agent Definition Language)** is an open, declarative, vendor-neutral specification for defining AI agents in a consistent, auditable, and interoperable way.  
 It provides a shared language for describing:
 

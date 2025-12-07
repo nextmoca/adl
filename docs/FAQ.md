@@ -1,5 +1,7 @@
 # ADL – Frequently Asked Questions (FAQ)
 
+For questions or contributions, visit: https://github.com/nextmoca/adl/issues
+
 ## What is ADL?
 ADL (Agent Definition Language) is an open, declarative standard for defining AI agents in a structured, portable, and framework-independent way. It describes an agent’s role, capabilities, tools, workflows, inputs, outputs, context needs, governance rules, and metadata.
 

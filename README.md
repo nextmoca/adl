@@ -10,6 +10,8 @@ This repo contains:
 - `docs/` — human-readable documentation
 - `CONTRIBUTING.md` — contribution and versioning guidelines
 
+For questions or contributions, visit: https://github.com/nextmoca/adl/issues
+
 ## Getting Started
 
 ### Clone

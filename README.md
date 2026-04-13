@@ -8,8 +8,7 @@
 
 <h1 align="center">ADL — Agent Definition Language</h1>
 <p align="center"><strong>A vendor-neutral, open standard for defining AI agents.</strong></p>
-#Developed and maintained by Next Moca Global, Inc.
-
+<p align="center"><strong>#Developed and maintained by Next Moca Global, Inc.</strong></p>
 ---
 
 ## 🚀 Overview

@@ -6,8 +6,9 @@
   <img src="https://img.shields.io/badge/Schema-Validated-brightgreen" alt="Schema Status"/>
 </p>
 
-<h1 align="center">ADL — Agent Definition Language Developed and maintained by Next Moca Global, Inc.</h1>
+<h1 align="center">ADL — Agent Definition Language</h1>
 <p align="center"><strong>A vendor-neutral, open standard for defining AI agents.</strong></p>
+#Developed and maintained by Next Moca Global, Inc.
 
 ---
 
